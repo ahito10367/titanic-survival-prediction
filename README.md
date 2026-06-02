@@ -1,2 +1,48 @@
-# titanic-survival-prediction
-Binary classification: predicting Titanic passenger survival with Random Forest, feature engineering &amp; cross-validation.
+#  Titanic Survival Prediction: Random Forest Pipeline
+
+##  Задача
+Бинарная классификация: предсказать выживаемость пассажиров «Титаника» на основе демографических и биллинговых признаков.
+
+##  Стек технологий
+- **Язык**: Python 3.x
+- **Обработка данных**: `pandas`, `numpy`
+- **Моделирование**: `scikit-learn` (`RandomForestClassifier`, `GridSearchCV`)
+- **Валидация**: Stratified 5-Fold Cross-Validation
+
+##  Пайплайн решения
+1. **Отбор признаков**: Удалены высококардинальные и нерелевантные колонки (`Name`, `Ticket`, `Cabin`, `PassengerId`). Оставлены: `Pclass`, `Sex`, `SibSp`, `Parch`, `Age`, `Fare`, `Embarked`.
+2. **Обработка пропусков**: `Age` и `Fare` заполнены медианными значениями из обучающей выборки.
+3. **Кодирование**: One-Hot Encoding через `pd.get_dummies()`. Колонка `Sex_male` удалена для устранения мультиколлинеарности (оставлена `Sex_female`).
+4. **Синхронизация выборок**: `X.align(X_test, join='inner', axis=1)` гарантирует идентичный набор признаков в train и test, предотвращая ошибки предсказания.
+5. **Обучение и тюнинг**: `GridSearchCV` с 5-кратной кросс-валидацией. Перебрано 48 комбинаций гиперпараметров:
+   - `n_estimators`: [50, 100, 150, 200]
+   - `max_depth`: [1..14]
+   - `min_samples_split`: [2, 5, 10]
+6. **Интерпретация**: Извлечены и ранжированы `feature_importances_` лучшей модели для анализа влияния признаков.
+
+##  Результаты
+| Метрика | Значение |
+|---------|----------|
+| **Best CV Accuracy** | 0.838 |
+| **Лучшие гиперпараметры** | `{'max_depth': 9, 'min_samples_split': 2, 'n_estimators': 200}` |
+
+###  Топ-важные признаки (Feature Importance)
+| Признак | Importance |
+|---------|------------|
+| `Sex_female` | 0.305 |
+| `Fare` | 0.236 |
+| `Age` | 0.209 |
+| `Pclass` | 0.106 |
+| `SibSp` | 0.057 |
+
+>  **Вывод**: Модель показала, что **пол** (`Sex_female`) и **экономический статус** (`Fare`, `Pclass`) являются наиболее значимыми предикторами выживаемости. Это полностью согласуется с историческими данными о правиле «женщины и дети первыми» и приоритете эвакуации пассажиров первого класса.
+
+##  Как запустить
+```bash
+# 1. Установить зависимости
+pip install -r requirements.txt
+
+# 2. Открыть ноутбук
+jupyter notebook notebooks/titanic_rf_pipeline.ipynb
+
+
