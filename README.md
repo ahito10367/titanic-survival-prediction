@@ -43,6 +43,6 @@
 pip install -r requirements.txt
 
 # 2. Открыть ноутбук
-jupyter notebook notebooks/titanic_rf_pipeline.ipynb
+jupyter notebook notebooks/src/titanic_rf_pipeline.ipynb
 
 
